@@ -2,6 +2,8 @@ import pygame
 from scipy.io import wavfile
 import numpy as np
 
+KEY_NUMS = 48
+
 
 def speedx(snd_array, factor):
     """ Speeds up / slows down a sound, by some factor. """
@@ -46,30 +48,30 @@ def pitchshift(snd_array, n, window_size=2**13, h=2**10):
     return speedx(stretched[window_size:], factor)
 
 
+print('parsing sound file...')
+
 fps, sound = wavfile.read("Music_Notes\\C.wav")
 sound = sound[:, -1]
 pygame.mixer.pre_init(fps, -16, 1, 512)
 pygame.init()
 
-
 file_names = ['C', 'C_s', 'D', 'D_s', 'E', 'F', 'F_s', 'G', 'G_s', 'A', 'Bb', 'B', 'C1', 'C_s1', 'D1', 'D_s1', 'E1', 'F1']
 folder_name = "Music_Notes\\"
 notes = []
 
-for i in range(25):
-    note = pitchshift(sound, i)
+for i in range(KEY_NUMS):
+    note = pitchshift(sound, i - 24)
     notes.append(pygame.sndarray.make_sound(note))
 
-C1 = pitchshift(sound, 24)
-C2 = pitchshift(sound, 12)
-notes.append(pygame.sndarray.make_sound(C2))
-notes.append(pygame.sndarray.make_sound(C1))
 
-keys = 'z s x d c v g b h n j m q 2 w 3 e r 5 t 6 y 7 u i ,'.split(' ')
+keys = [
+        'left ctrl', 'left alt', 'z', 'a', 'x', 's', 'c', 'd', 'v', 'f', 'b', 'g',
+        'tab', '`', 'q', '1', 'w', '2', 'e', '3', 'r', '4', 't', '5',
+        'n', 'h', 'm', 'j', ',', 'k', '.', 'l', '/', ';', "'", 'right alt',
+        'y', '6', 'u', '7', 'i', '8', 'o', '9', 'p', '0', '[', '-'
+        ]
 KEYS = {x[0]: x[1] for x in zip(keys, notes)}
 
-
 if __name__ == '__main__':
-    for k in KEYS:
-        print(k)
+    print(len(notes), len(keys))
 
