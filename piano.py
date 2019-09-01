@@ -7,7 +7,7 @@ from vector import Vector2
 from music import Cannon
 
 SIZE = Vector2(1080, 800)
-
+HIT_COLOR = (190, 231, 233)
 BLACK_KEYS = [1, 3, 6, 8, 10]
 WHITE_IDX = [i for i in range(notes.KEY_NUMS) if (i % 12) not in BLACK_KEYS]
 BLACK_IDX = [i for i in range(notes.KEY_NUMS) if (i % 12) in BLACK_KEYS]
@@ -22,8 +22,8 @@ is_playing = {}
 screen = pygame.display.set_mode(SIZE)
 pygame.display.set_caption("Piano Game")
 clock = pygame.time.Clock()
-font = pygame.font.SysFont("Consolas",20)
-
+font = pygame.font.SysFont("Consolas", 20)
+game_mode = 0
 
 class Note:
     def __init__(self, pitch, length, start=0):
@@ -85,6 +85,7 @@ class Music:
         global is_playing
         self.time = -3000
         self.bar_time = -3000
+        self.bar = 0
         is_playing = {k: False for k in notes.KEYS}
 
 
@@ -102,35 +103,37 @@ def get_keys_pos():
 
 
 def draw_piano(screen, white_pos, black_pos):
+    if not game_mode:
+        demo = font.render("Press 'SPACE' to watch demo.", True, (0, 0, 0))
+    else:
+        demo = font.render("Cannon", True, (0, 0, 0))
+    screen.blit(demo, ((SIZE[0] - demo.get_width())//2, 100))
 
-    demo = font.render("Press 'SPACE' to watch the demo !", True, (0, 0, 0))
-    screen.blit(demo, ((SIZE[0] - demo.get_width( ))//2, 100))
     for idx, i in enumerate(white_pos):
         x = i[0] + PIANO_POS[0]
         y = i[1] + PIANO_POS[1]
         k = notes.keys[WHITE_IDX[idx]]
-        color = (192, 247, 252) if is_playing[k] else (250, 250, 250)
+        color = HIT_COLOR if is_playing[k] else (250, 250, 245)
         pygame.draw.rect(screen, color, (x, y, K_WIDTH, K_HEIGHT))
         pygame.draw.rect(screen, (10, 10, 10), (x-1, y, K_WIDTH+1, K_HEIGHT+1), 1)
     for idx, i in enumerate(black_pos):
         x = i[0] + PIANO_POS[0]
         y = i[1] + PIANO_POS[1]
         k = notes.keys[BLACK_IDX[idx]]
-        color = (192, 247, 252) if is_playing[k] else (10, 10, 10)
+        color = HIT_COLOR if is_playing[k] else (10, 10, 10)
         pygame.draw.rect(screen, color, (x, y, K_WIDTH//2, K_HEIGHT * 2 // 3))
         pygame.draw.rect(screen, (200, 200, 200), (x-1, y, K_WIDTH//2+1,  K_HEIGHT * 2 // 3 + 1), 1)
 
 
 def init_game():
     global screen, clock, white_pos, black_pos, is_playing, game_mode
-    game_mode = 1
+    game_mode = 0
     white_pos, black_pos = get_keys_pos()
     is_playing = {k: False for k in notes.KEYS}
 
 
 def parse_score(score):
     music = []
-    music_bar = []
     for bar in score:
         music_bar = []
         for note in bar:
