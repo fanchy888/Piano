@@ -61,6 +61,7 @@ notes = []
 
 for i in range(KEY_NUMS):
     note = pitchshift(sound, i - 24)
+    note = np.array([[i, i] for i in note])
     notes.append(pygame.sndarray.make_sound(note))
 
 
